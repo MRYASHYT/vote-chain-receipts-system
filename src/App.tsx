@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import VoteList from "./pages/VoteList";
 import VoteDetail from "./pages/VoteDetail";
 import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
 // Create a client
@@ -31,6 +32,7 @@ const App: React.FC = () => {
                 <Route path="/votes" element={<VoteList />} />
                 <Route path="/votes/:id" element={<VoteDetail />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

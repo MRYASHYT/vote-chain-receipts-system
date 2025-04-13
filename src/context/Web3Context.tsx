@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { ethers } from 'ethers';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface Web3ContextType {
   account: string | null;
@@ -32,7 +32,9 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   const isConnected = !!account;
-  const isAdmin = account ? account.toLowerCase() === ADMIN_ADDRESS.toLowerCase() : false;
+  // Check both address match AND if admin access is granted via secret code
+  const isAdmin = (account ? account.toLowerCase() === ADMIN_ADDRESS.toLowerCase() : false) || 
+                  sessionStorage.getItem('adminAccess') === 'true';
 
   const connectWallet = async () => {
     if (window.ethereum) {
@@ -76,6 +78,8 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     setAccount(null);
     localStorage.removeItem('walletConnected');
     localStorage.removeItem('walletAddress');
+    // Clear admin access on disconnect
+    sessionStorage.removeItem('adminAccess');
     toast({
       title: "Wallet Disconnected",
       description: "Your wallet has been disconnected",

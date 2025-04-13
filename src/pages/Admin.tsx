@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +15,6 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Vote } from '@/types/vote';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -29,21 +27,14 @@ const Admin = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>();
   
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/admin-login');
+    }
+  }, [isAdmin, navigate]);
+
   if (!isAdmin) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Access Denied</AlertTitle>
-          <AlertDescription>
-            You don't have permission to access the admin panel.
-          </AlertDescription>
-        </Alert>
-        <div className="mt-6 flex justify-center">
-          <Button onClick={() => navigate('/')}>Return to Home</Button>
-        </div>
-      </div>
-    );
+    return null; // Will redirect in useEffect
   }
   
   const addOption = () => {
