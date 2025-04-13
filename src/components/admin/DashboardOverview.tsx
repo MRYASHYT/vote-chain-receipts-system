@@ -64,6 +64,21 @@ const DashboardOverview = () => {
     })).slice(-7); // Last 7 days
   };
 
+  // Custom tooltip component that follows the expected recharts structure
+  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
+    if (active && payload && payload.length) {
+      return (
+        <ChartTooltip>
+          <ChartTooltipContent
+            active={active}
+            payload={payload}
+          />
+        </ChartTooltip>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Dashboard Overview</h2>
@@ -134,16 +149,7 @@ const DashboardOverview = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip
-                  content={({ active, payload }) => (
-                    <ChartTooltip>
-                      <ChartTooltipContent
-                        active={active}
-                        payload={payload}
-                      />
-                    </ChartTooltip>
-                  )}
-                />
+                <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="votes" fill="var(--color-votes)" />
               </BarChart>
             </ResponsiveContainer>
