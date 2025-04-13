@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CandidateManager from '@/components/admin/CandidateManager';
+import DashboardOverview from '@/components/admin/DashboardOverview';
 import { Vote } from '@/types/vote';
 
 const Admin = () => {
@@ -31,7 +32,7 @@ const Admin = () => {
   const [options, setOptions] = useState(['', '']);
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [activeTab, setActiveTab] = useState('create');
+  const [activeTab, setActiveTab] = useState('dashboard'); // Updated default tab to dashboard
   const [adminVotes, setAdminVotes] = useState<Vote[]>([]);
   
   useEffect(() => {
@@ -193,10 +194,16 @@ const Admin = () => {
       <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-2">
+        <TabsList className="grid grid-cols-3">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="create">Create Vote</TabsTrigger>
           <TabsTrigger value="manage">Manage Votes</TabsTrigger>
         </TabsList>
+        
+        {/* Dashboard Tab */}
+        <TabsContent value="dashboard">
+          <DashboardOverview />
+        </TabsContent>
         
         <TabsContent value="create">
           <Card className="blockchain-card mb-6">
