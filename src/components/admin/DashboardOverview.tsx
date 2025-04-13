@@ -6,6 +6,7 @@ import { Vote } from "@/types/vote";
 import { BarChart3, CalendarCheck, Users, VoteIcon } from "lucide-react";
 import { ChartContainer } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from "recharts";
+import { TooltipProvider, Tooltip as UITooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface DashboardStats {
   totalVotes: number;
@@ -72,7 +73,7 @@ const DashboardOverview = () => {
   const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
       return (
-        <div className="rounded-lg border bg-background p-2 shadow-md">
+        <div className="rounded-lg border bg-background p-2 shadow-md z-50">
           <p className="font-medium">{`${label}`}</p>
           <p className="text-sm text-blue-600">{`Votes: ${payload[0].value}`}</p>
         </div>
@@ -147,11 +148,11 @@ const DashboardOverview = () => {
         <CardContent className="h-[300px]">
           <ChartContainer config={{ votes: { color: '#2563eb' } }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={getVoteActivityData()}>
+              <BarChart data={getVoteActivityData()} margin={{ top: 5, right: 30, left: 20, bottom: 25 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip content={CustomTooltip} />
+                <Tooltip content={<CustomTooltip />} wrapperStyle={{ zIndex: 1000 }} />
                 <Bar dataKey="votes" fill="var(--color-votes)" />
               </BarChart>
             </ResponsiveContainer>
@@ -160,7 +161,7 @@ const DashboardOverview = () => {
       </Card>
       
       {/* Recent Elections */}
-      <Card>
+      <Card className="mt-8">
         <CardHeader>
           <CardTitle>Recent Elections</CardTitle>
         </CardHeader>
