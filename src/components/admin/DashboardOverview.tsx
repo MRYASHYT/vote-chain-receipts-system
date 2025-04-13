@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockData } from "@/lib/mockData";
@@ -64,14 +63,15 @@ const DashboardOverview = () => {
     })).slice(-7); // Last 7 days
   };
 
-  // Custom tooltip component that follows the expected recharts structure
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
+  // Create a properly typed CustomTooltip component for Recharts
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <ChartTooltip>
           <ChartTooltipContent
             active={active}
             payload={payload}
+            label={label}
           />
         </ChartTooltip>
       );
@@ -149,7 +149,7 @@ const DashboardOverview = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={CustomTooltip} />
                 <Bar dataKey="votes" fill="var(--color-votes)" />
               </BarChart>
             </ResponsiveContainer>
