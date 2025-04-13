@@ -1,5 +1,5 @@
 
-import { MockVoteData } from "@/types/vote";
+import { MockVoteData, Vote, VoteReceipt } from "@/types/vote";
 
 // Mock data for development
 export const mockData: MockVoteData = {
