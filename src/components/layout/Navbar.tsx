@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3 } from '@/context/Web3Context';
 import { Button } from '@/components/ui/button';
-import { FileText, Shield, Home, Menu, X } from 'lucide-react';
+import { FileText, Shield, Home, Menu, X, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Navbar() {
@@ -41,8 +41,17 @@ export function Navbar() {
           )}
         </nav>
 
-        {/* Wallet Connect Button */}
-        <div className="hidden md:flex">
+        {/* Wallet Connect Button and Admin Icon */}
+        <div className="hidden md:flex items-center space-x-2">
+          {isAdmin && (
+            <Link 
+              to="/admin" 
+              className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors mr-1"
+              title="Admin Panel"
+            >
+              <Settings size={18} />
+            </Link>
+          )}
           {isConnected ? (
             <div className="flex items-center space-x-2">
               <div className="px-3 py-1 rounded-full bg-muted text-sm">
@@ -106,6 +115,17 @@ export function Navbar() {
                 <Shield size={16} />
                 <span>Admin</span>
               </div>
+            </Link>
+          )}
+          
+          {isAdmin && (
+            <Link 
+              to="/admin" 
+              className="block px-4 py-2 text-sm hover:bg-muted rounded-md flex items-center space-x-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Settings size={16} />
+              <span>Admin Panel</span>
             </Link>
           )}
           
