@@ -1,10 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockData } from "@/lib/mockData";
 import { Vote } from "@/types/vote";
 import { BarChart3, CalendarCheck, Users, VoteIcon } from "lucide-react";
-import { ChartContainer, ChartTooltipContent, ChartTooltip } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { ChartContainer } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from "recharts";
 
 interface DashboardStats {
   totalVotes: number;
@@ -12,6 +13,10 @@ interface DashboardStats {
   totalVoters: number;
   totalCandidates: number;
 }
+
+// Define the Recharts tooltip prop types
+type ValueType = number | string | Array<number | string>;
+type NameType = number | string;
 
 const DashboardOverview = () => {
   const [stats, setStats] = useState<DashboardStats>({
@@ -63,17 +68,14 @@ const DashboardOverview = () => {
     })).slice(-7); // Last 7 days
   };
 
-  // Create a properly typed CustomTooltip component for Recharts
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  // Custom tooltip for the chart
+  const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
       return (
-        <ChartTooltip>
-          <ChartTooltipContent
-            active={active}
-            payload={payload}
-            label={label}
-          />
-        </ChartTooltip>
+        <div className="rounded-lg border bg-background p-2 shadow-md">
+          <p className="font-medium">{`${label}`}</p>
+          <p className="text-sm text-blue-600">{`Votes: ${payload[0].value}`}</p>
+        </div>
       );
     }
     return null;
