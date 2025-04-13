@@ -5,7 +5,7 @@ import { mockData } from "@/lib/mockData";
 import { Vote } from "@/types/vote";
 import { BarChart3, CalendarCheck, Users, VoteIcon } from "lucide-react";
 import { ChartContainer, ChartTooltipContent, ChartTooltip } from "@/components/ui/chart";
-import { ResponsiveBar } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface DashboardStats {
   totalVotes: number;
@@ -129,33 +129,24 @@ const DashboardOverview = () => {
         </CardHeader>
         <CardContent className="h-[300px]">
           <ChartContainer config={{ votes: { color: '#2563eb' } }}>
-            <ResponsiveBar
-              data={getVoteActivityData()}
-              keys={['votes']}
-              indexBy="date"
-              margin={{ top: 10, right: 10, bottom: 30, left: 40 }}
-              padding={0.4}
-              valueScale={{ type: 'linear' }}
-              colors={['var(--color-votes)']}
-              axisBottom={{
-                tickSize: 0,
-                tickPadding: 16,
-              }}
-              axisLeft={{
-                tickSize: 0,
-                tickValues: 5,
-                tickPadding: 16,
-              }}
-              gridYValues={5}
-              tooltip={(props) => (
-                <ChartTooltip>
-                  <ChartTooltipContent
-                    active={props.active}
-                    payload={props.payload}
-                  />
-                </ChartTooltip>
-              )}
-            />
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={getVoteActivityData()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip
+                  content={({ active, payload }) => (
+                    <ChartTooltip>
+                      <ChartTooltipContent
+                        active={active}
+                        payload={payload}
+                      />
+                    </ChartTooltip>
+                  )}
+                />
+                <Bar dataKey="votes" fill="var(--color-votes)" />
+              </BarChart>
+            </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
       </Card>
