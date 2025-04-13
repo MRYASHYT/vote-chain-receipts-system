@@ -1,5 +1,78 @@
 
-import { MockVoteData, Vote, VoteReceipt } from "@/types/vote";
+import { MockVoteData, Vote, VoteReceipt, Candidate } from "@/types/vote";
+
+// Mock candidates data
+const candidates: Record<string, Candidate[]> = {
+  "vote-1": [
+    {
+      id: "candidate-1",
+      name: "Alice Johnson",
+      photoUrl: "/images/candidate-1.jpg",
+      biography: "Alice has 10 years of experience in protocol development and blockchain architecture.",
+      optionId: 0
+    },
+    {
+      id: "candidate-2",
+      name: "Robert Chen",
+      photoUrl: "/images/candidate-2.jpg",
+      biography: "Marketing expert with focus on blockchain projects and community building.",
+      optionId: 1
+    },
+    {
+      id: "candidate-3",
+      name: "Elena Rodriguez",
+      photoUrl: "/images/candidate-3.jpg",
+      biography: "DeFi specialist focusing on liquidity mechanisms and yield optimization.",
+      optionId: 2
+    },
+    {
+      id: "candidate-4",
+      name: "Marcus Williams",
+      photoUrl: "/images/candidate-4.jpg",
+      biography: "Event coordinator with experience in both virtual and physical blockchain conferences.",
+      optionId: 3
+    }
+  ],
+  "vote-2": [
+    {
+      id: "candidate-5",
+      name: "Sophia Lee",
+      photoUrl: "/images/candidate-5.jpg",
+      biography: "Governance expert advocating for higher quorum requirements for security.",
+      optionId: 0
+    },
+    {
+      id: "candidate-6",
+      name: "David Park",
+      photoUrl: "/images/candidate-6.jpg",
+      biography: "Governance specialist arguing for maintaining current quorum levels for accessibility.",
+      optionId: 1
+    }
+  ],
+  "vote-3": [
+    {
+      id: "candidate-7",
+      name: "James Wilson",
+      photoUrl: "/images/candidate-7.jpg",
+      biography: "Lead developer for the V2 smart contract upgrade implementation.",
+      optionId: 0
+    },
+    {
+      id: "candidate-8",
+      name: "Ana Martins",
+      photoUrl: "/images/candidate-8.jpg",
+      biography: "Security auditor who recommended delaying the upgrade for further testing.",
+      optionId: 1
+    },
+    {
+      id: "candidate-9",
+      name: "Terrence Goldman",
+      photoUrl: "/images/candidate-9.jpg",
+      biography: "Community moderator taking a neutral stance pending more information.",
+      optionId: 2
+    }
+  ]
+};
 
 // Mock data for development
 export const mockData: MockVoteData = {
@@ -18,7 +91,8 @@ export const mockData: MockVoteData = {
       endDate: new Date("2023-04-15"),
       isActive: true,
       createdBy: "0x8ba1f109551bD432803012645Ac136ddd64DBA72",
-      blockchainTxId: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      blockchainTxId: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      candidates: candidates["vote-1"]
     },
     {
       id: "vote-2",
@@ -29,7 +103,8 @@ export const mockData: MockVoteData = {
       endDate: new Date("2023-03-30"),
       isActive: false,
       createdBy: "0x8ba1f109551bD432803012645Ac136ddd64DBA72",
-      blockchainTxId: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+      blockchainTxId: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      candidates: candidates["vote-2"]
     },
     {
       id: "vote-3",
@@ -40,7 +115,8 @@ export const mockData: MockVoteData = {
       endDate: new Date("2023-04-25"),
       isActive: true,
       createdBy: "0x8ba1f109551bD432803012645Ac136ddd64DBA72",
-      blockchainTxId: "0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456"
+      blockchainTxId: "0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456",
+      candidates: candidates["vote-3"]
     }
   ],
   results: {
@@ -125,3 +201,39 @@ export const createMockVote = (vote: Omit<Vote, 'id' | 'blockchainTxId'>): Vote 
   mockData.votes.push(newVote);
   return newVote;
 };
+
+// Function to add a new candidate
+export const addCandidate = (voteId: string, candidate: Omit<Candidate, 'id'>): Candidate => {
+  const vote = mockData.votes.find(v => v.id === voteId);
+  
+  if (!vote) {
+    throw new Error(`Vote with ID ${voteId} not found`);
+  }
+  
+  if (!vote.candidates) {
+    vote.candidates = [];
+  }
+  
+  const newCandidate = {
+    ...candidate,
+    id: `candidate-${Date.now()}`
+  };
+  
+  vote.candidates.push(newCandidate);
+  return newCandidate;
+};
+
+// Function to remove a candidate
+export const removeCandidate = (voteId: string, candidateId: string): boolean => {
+  const vote = mockData.votes.find(v => v.id === voteId);
+  
+  if (!vote || !vote.candidates) {
+    return false;
+  }
+  
+  const initialLength = vote.candidates.length;
+  vote.candidates = vote.candidates.filter(c => c.id !== candidateId);
+  
+  return vote.candidates.length < initialLength;
+};
+

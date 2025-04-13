@@ -9,6 +9,15 @@ export interface Vote {
   isActive: boolean;
   createdBy: string;
   blockchainTxId?: string;
+  candidates?: Candidate[];
+}
+
+export interface Candidate {
+  id: string;
+  name: string;
+  photoUrl: string;
+  biography: string;
+  optionId: number;
 }
 
 export interface VoteResult {

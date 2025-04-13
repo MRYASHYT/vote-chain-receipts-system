@@ -7,12 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { VoteReceipt } from '@/components/vote/VoteReceipt';
-import { ArrowLeft, Calendar, Check, ChevronRight, Loader2, Shield } from 'lucide-react';
+import { ArrowLeft, Calendar, Check, ChevronRight, Loader2, Shield, User, Users } from 'lucide-react';
 import { mockData, simulateBlockchainVote } from '@/lib/mockData';
 import { Vote, VoteReceipt as VoteReceiptType } from '@/types/vote';
 import { useWeb3 } from '@/context/Web3Context';
 import { useToast } from '@/components/ui/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import CandidateCard from '@/components/vote/CandidateCard';
 
 const VoteDetail = () => {
   const { id } = useParams();
@@ -27,6 +29,7 @@ const VoteDetail = () => {
   const [receipt, setReceipt] = useState<VoteReceiptType | null>(null);
   const [results, setResults] = useState<{optionId: number, optionText: string, votes: number}[]>([]);
   const [totalVotes, setTotalVotes] = useState(0);
+  const [activeTab, setActiveTab] = useState("vote");
   
   useEffect(() => {
     if (id) {
@@ -173,56 +176,92 @@ const VoteDetail = () => {
             )}
           </div>
           
-          {hasVoted ? (
-            <div>
-              <h3 className="font-medium mb-4">Current Results</h3>
-              <div className="space-y-4">
-                {results.map((result) => (
-                  <div key={result.optionId} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="flex items-center">
-                        {selectedOption === result.optionText && (
-                          <Check size={16} className="mr-2 text-green-600" />
-                        )}
-                        {result.optionText}
-                      </span>
-                      <span className="text-sm">
-                        {result.votes} votes ({totalVotes > 0 ? Math.round((result.votes / totalVotes) * 100) : 0}%)
-                      </span>
-                    </div>
-                    <Progress 
-                      value={totalVotes > 0 ? (result.votes / totalVotes) * 100 : 0} 
-                      className={selectedOption === result.optionText ? "bg-muted h-2" : "bg-muted h-2"} 
-                    />
-                  </div>
-                ))}
-                <div className="mt-2 text-sm text-muted-foreground">
-                  Total votes: {totalVotes}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="vote">
+                <div className="flex items-center">
+                  Vote
                 </div>
-              </div>
-            </div>
-          ) : (
-            vote.isActive ? (
-              <div>
-                <h3 className="font-medium mb-4">Cast your vote</h3>
-                <RadioGroup value={selectedOption} onValueChange={setSelectedOption}>
-                  {vote.options.map((option, idx) => (
-                    <div key={idx} className="flex items-center space-x-2 mb-2">
-                      <RadioGroupItem value={option} id={`option-${idx}`} />
-                      <Label htmlFor={`option-${idx}`}>{option}</Label>
+              </TabsTrigger>
+              <TabsTrigger value="candidates">
+                <div className="flex items-center">
+                  <Users size={16} className="mr-2" />
+                  Candidates
+                </div>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="vote" className="pt-6">
+              {hasVoted ? (
+                <div>
+                  <h3 className="font-medium mb-4">Current Results</h3>
+                  <div className="space-y-4">
+                    {results.map((result) => (
+                      <div key={result.optionId} className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center">
+                            {selectedOption === result.optionText && (
+                              <Check size={16} className="mr-2 text-green-600" />
+                            )}
+                            {result.optionText}
+                          </span>
+                          <span className="text-sm">
+                            {result.votes} votes ({totalVotes > 0 ? Math.round((result.votes / totalVotes) * 100) : 0}%)
+                          </span>
+                        </div>
+                        <Progress 
+                          value={totalVotes > 0 ? (result.votes / totalVotes) * 100 : 0} 
+                          className={selectedOption === result.optionText ? "bg-muted h-2" : "bg-muted h-2"} 
+                        />
+                      </div>
+                    ))}
+                    <div className="mt-2 text-sm text-muted-foreground">
+                      Total votes: {totalVotes}
                     </div>
+                  </div>
+                </div>
+              ) : (
+                vote.isActive ? (
+                  <div>
+                    <h3 className="font-medium mb-4">Cast your vote</h3>
+                    <RadioGroup value={selectedOption} onValueChange={setSelectedOption}>
+                      {vote.options.map((option, idx) => (
+                        <div key={idx} className="flex items-center space-x-2 mb-2">
+                          <RadioGroupItem value={option} id={`option-${idx}`} />
+                          <Label htmlFor={`option-${idx}`}>{option}</Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+                ) : (
+                  <div className="rounded-md bg-muted p-4">
+                    <p className="text-center text-muted-foreground">This vote has ended</p>
+                  </div>
+                )
+              )}
+            </TabsContent>
+            
+            <TabsContent value="candidates" className="pt-6">
+              {vote.candidates && vote.candidates.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {vote.candidates.map((candidate) => (
+                    <CandidateCard 
+                      key={candidate.id} 
+                      candidate={candidate} 
+                      option={vote.options[candidate.optionId]}
+                    />
                   ))}
-                </RadioGroup>
-              </div>
-            ) : (
-              <div className="rounded-md bg-muted p-4">
-                <p className="text-center text-muted-foreground">This vote has ended</p>
-              </div>
-            )
-          )}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No candidate information available for this vote
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </CardContent>
         <CardFooter className="flex justify-end">
-          {!hasVoted && vote.isActive ? (
+          {activeTab === "vote" && !hasVoted && vote.isActive ? (
             isConnected ? (
               <Button onClick={handleVote} disabled={isVoting || !selectedOption} className="gradient-bg border-0 hover:opacity-90">
                 {isVoting ? (
@@ -245,7 +284,7 @@ const VoteDetail = () => {
       </Card>
       
       {/* Vote receipt */}
-      {receipt && (
+      {receipt && activeTab === "vote" && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Your Vote Receipt</h2>
           <VoteReceipt receipt={receipt} />
