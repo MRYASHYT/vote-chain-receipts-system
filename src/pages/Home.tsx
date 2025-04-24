@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -32,7 +32,7 @@ const Home = () => {
         <div className="absolute inset-0 gradient-bg opacity-40 -z-10" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Secure Voting on the Blockchain</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">Voting on the Blockchain</h1>
             <p className="text-xl mb-8">
               VoteChain provides transparent, tamper-proof voting with instant verifiable results and downloadable receipts.
             </p>
