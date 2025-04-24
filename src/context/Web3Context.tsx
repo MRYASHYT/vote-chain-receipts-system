@@ -2,6 +2,8 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { ethers } from 'ethers';
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
+import { VoterVerification } from '@/components/VoterVerification';
 
 interface Web3ContextType {
   account: string | null;
