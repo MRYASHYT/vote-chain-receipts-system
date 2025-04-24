@@ -144,6 +144,36 @@ export type Database = {
         }
         Relationships: []
       }
+      voters: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          is_verified: boolean | null
+          updated_at: string
+          voter_id: string
+          wallet_address: string | null
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          is_verified?: boolean | null
+          updated_at?: string
+          voter_id: string
+          wallet_address?: string | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          is_verified?: boolean | null
+          updated_at?: string
+          voter_id?: string
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

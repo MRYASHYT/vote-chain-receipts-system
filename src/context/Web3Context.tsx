@@ -7,6 +7,7 @@ interface Web3ContextType {
   account: string | null;
   isConnected: boolean;
   isAdmin: boolean;
+  isVoterVerified: boolean;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   networkName: string;
@@ -16,6 +17,7 @@ const Web3Context = createContext<Web3ContextType>({
   account: null,
   isConnected: false,
   isAdmin: false,
+  isVoterVerified: false,
   connectWallet: async () => {},
   disconnectWallet: () => {},
   networkName: ''
@@ -29,12 +31,28 @@ const ADMIN_ADDRESS = '0x8ba1f109551bD432803012645Ac136ddd64DBA72';
 export const Web3Provider = ({ children }: { children: ReactNode }) => {
   const [account, setAccount] = useState<string | null>(null);
   const [networkName, setNetworkName] = useState<string>('');
+  const [isVoterVerified, setIsVoterVerified] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
   const { toast } = useToast();
 
   const isConnected = !!account;
-  // Check both address match AND if admin access is granted via secret code
-  const isAdmin = (account ? account.toLowerCase() === ADMIN_ADDRESS.toLowerCase() : false) || 
-                  sessionStorage.getItem('adminAccess') === 'true';
+  const isAdmin = account ? account.toLowerCase() === ADMIN_ADDRESS.toLowerCase() : false;
+
+  const checkVoterVerification = async (address: string) => {
+    try {
+      const { data: voter } = await supabase
+        .from('voters')
+        .select('is_verified')
+        .eq('wallet_address', address.toLowerCase())
+        .maybeSingle();
+      
+      setIsVoterVerified(!!voter?.is_verified);
+      return !!voter?.is_verified;
+    } catch (error) {
+      console.error('Error checking voter verification:', error);
+      return false;
+    }
+  };
 
   const connectWallet = async () => {
     if (window.ethereum) {
@@ -48,12 +66,18 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
           const network = await provider.getNetwork();
           setNetworkName(network.name === 'homestead' ? 'Ethereum Mainnet' : network.name);
           
+          // Check if the wallet is already verified
+          const isVerified = await checkVoterVerification(accounts[0]);
+          
+          if (!isVerified) {
+            setShowVerification(true);
+          }
+          
           toast({
             title: "Wallet Connected",
             description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
           });
           
-          // Save to local storage
           localStorage.setItem('walletConnected', 'true');
           localStorage.setItem('walletAddress', accounts[0]);
         }
@@ -88,7 +112,6 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const checkConnection = async () => {
-      // Check if user was previously connected
       const wasConnected = localStorage.getItem('walletConnected') === 'true';
       const savedAddress = localStorage.getItem('walletAddress');
       
@@ -99,6 +122,7 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
           
           if (accounts.length > 0) {
             setAccount(accounts[0]);
+            await checkVoterVerification(accounts[0]);
             
             const network = await provider.getNetwork();
             setNetworkName(network.name === 'homestead' ? 'Ethereum Mainnet' : network.name);
@@ -111,11 +135,12 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
     
     checkConnection();
     
-    const handleAccountsChanged = (accounts: string[]) => {
+    const handleAccountsChanged = async (accounts: string[]) => {
       if (accounts.length === 0) {
         disconnectWallet();
       } else if (accounts[0] !== account) {
         setAccount(accounts[0]);
+        await checkVoterVerification(accounts[0]);
         localStorage.setItem('walletAddress', accounts[0]);
       }
     };
@@ -136,13 +161,21 @@ export const Web3Provider = ({ children }: { children: ReactNode }) => {
       value={{ 
         account, 
         isConnected, 
-        isAdmin, 
+        isAdmin,
+        isVoterVerified,
         connectWallet, 
         disconnectWallet,
         networkName
       }}
     >
       {children}
+      {showVerification && account && (
+        <VoterVerification
+          isOpen={showVerification}
+          onClose={() => setShowVerification(false)}
+          walletAddress={account}
+        />
+      )}
     </Web3Context.Provider>
   );
 };
