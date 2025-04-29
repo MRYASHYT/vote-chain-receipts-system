@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWeb3 } from '@/context/Web3Context';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,14 @@ const AdminLogin = () => {
   const { isConnected } = useWeb3();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Check if admin access is already granted on component mount
+  useEffect(() => {
+    const adminAccess = sessionStorage.getItem('adminAccess');
+    if (adminAccess === 'true') {
+      navigate('/admin');
+    }
+  }, [navigate]);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,8 +55,10 @@ const AdminLogin = () => {
         description: "Welcome to the admin panel",
       });
       
-      // Navigate to admin page
-      navigate('/admin');
+      // Navigate to admin page after a short delay to ensure the toast is visible
+      setTimeout(() => {
+        navigate('/admin');
+      }, 500);
     } else {
       toast({
         title: "Access denied",

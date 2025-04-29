@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Web3Provider } from "./context/Web3Context";
 import Navbar from "./components/layout/Navbar";
 import Home from "./pages/Home";
@@ -16,6 +16,17 @@ import NotFound from "./pages/NotFound";
 
 // Create a client
 const queryClient = new QueryClient();
+
+// Admin route protector
+const ProtectedAdminRoute = ({ children }: { children: JSX.Element }) => {
+  const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
+  
+  if (!isAdmin) {
+    return <Navigate to="/admin-login" replace />;
+  }
+  
+  return children;
+};
 
 const App: React.FC = () => {
   return (
@@ -31,7 +42,11 @@ const App: React.FC = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/votes" element={<VoteList />} />
                 <Route path="/votes/:id" element={<VoteDetail />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin" element={
+                  <ProtectedAdminRoute>
+                    <Admin />
+                  </ProtectedAdminRoute>
+                } />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
