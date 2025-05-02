@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,31 +32,29 @@ const ProtectedAdminRoute = ({ children }: { children: JSX.Element }) => {
 
 const App: React.FC = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Web3Provider>
-            <BrowserRouter>
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/votes" element={<VoteList />} />
-                <Route path="/votes/:id" element={<VoteDetail />} />
-                <Route path="/admin" element={
-                  <ProtectedAdminRoute>
-                    <Admin />
-                  </ProtectedAdminRoute>
-                } />
-                <Route path="/admin-login" element={<AdminLogin />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </Web3Provider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <Web3Provider>
+          <BrowserRouter>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/votes" element={<VoteList />} />
+              <Route path="/votes/:id" element={<VoteDetail />} />
+              <Route path="/admin" element={
+                <ProtectedAdminRoute>
+                  <Admin />
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </Web3Provider>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 

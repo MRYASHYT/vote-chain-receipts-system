@@ -26,15 +26,17 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { isConnected } = useWeb3();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [redirected, setRedirected] = useState(false);
   
-  // Check if admin access is already granted on component mount
+  // Check if admin access is already granted on component mount - only once
   useEffect(() => {
     const adminAccess = sessionStorage.getItem('adminAccess');
-    if (adminAccess === 'true') {
+    if (adminAccess === 'true' && !redirected) {
       console.log("Admin access found in session storage, redirecting to /admin");
+      setRedirected(true);
       navigate('/admin');
     }
-  }, [navigate]);
+  }, [navigate, redirected]);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -58,7 +60,7 @@ const AdminLogin = () => {
         description: "Welcome to the admin panel",
       });
       
-      // Navigate to admin page immediately
+      setRedirected(true);
       navigate('/admin');
     } else {
       toast({
