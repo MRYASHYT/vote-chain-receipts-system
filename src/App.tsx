@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Web3Provider } from "./context/Web3Context";
 import Navbar from "./components/layout/Navbar";
 import Home from "./pages/Home";
@@ -17,13 +17,14 @@ import NotFound from "./pages/NotFound";
 // Create a client
 const queryClient = new QueryClient();
 
-// Admin route protector
+// Admin route protector - improved version
 const ProtectedAdminRoute = ({ children }: { children: JSX.Element }) => {
   const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
+  const location = useLocation();
   
   if (!isAdmin) {
     console.log("Admin access denied, redirecting to login");
-    return <Navigate to="/admin-login" replace />;
+    return <Navigate to="/admin-login" replace state={{ from: location }} />;
   }
   
   console.log("Admin access verified, rendering admin route");

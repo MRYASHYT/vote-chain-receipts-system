@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useWeb3 } from '@/context/Web3Context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,19 +24,18 @@ type FormValues = z.infer<typeof formSchema>;
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isConnected } = useWeb3();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [redirected, setRedirected] = useState(false);
   
-  // Check if admin access is already granted on component mount - only once
+  // Check if admin access is already granted on mount
   useEffect(() => {
-    const adminAccess = sessionStorage.getItem('adminAccess');
-    if (adminAccess === 'true' && !redirected) {
+    // Only redirect if we're not already on the /admin page (prevents infinite loops)
+    if (sessionStorage.getItem('adminAccess') === 'true' && location.pathname !== '/admin') {
       console.log("Admin access found in session storage, redirecting to /admin");
-      setRedirected(true);
-      navigate('/admin');
+      navigate('/admin', { replace: true });
     }
-  }, [navigate, redirected]);
+  }, [navigate, location.pathname]);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -60,8 +59,8 @@ const AdminLogin = () => {
         description: "Welcome to the admin panel",
       });
       
-      setRedirected(true);
-      navigate('/admin');
+      // Use replace to avoid adding to history stack
+      navigate('/admin', { replace: true });
     } else {
       toast({
         title: "Access denied",
