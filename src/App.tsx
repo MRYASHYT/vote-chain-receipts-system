@@ -22,9 +22,11 @@ const ProtectedAdminRoute = ({ children }: { children: JSX.Element }) => {
   const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
   
   if (!isAdmin) {
+    console.log("Admin access denied, redirecting to login");
     return <Navigate to="/admin-login" replace />;
   }
   
+  console.log("Admin access verified, rendering admin route");
   return children;
 };
 

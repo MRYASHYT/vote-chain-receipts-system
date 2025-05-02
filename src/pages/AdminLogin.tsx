@@ -31,6 +31,7 @@ const AdminLogin = () => {
   useEffect(() => {
     const adminAccess = sessionStorage.getItem('adminAccess');
     if (adminAccess === 'true') {
+      console.log("Admin access found in session storage, redirecting to /admin");
       navigate('/admin');
     }
   }, [navigate]);
@@ -50,15 +51,15 @@ const AdminLogin = () => {
       // Store admin access in session storage
       sessionStorage.setItem('adminAccess', 'true');
       
+      console.log("Admin code verified, access granted, redirecting to /admin");
+      
       toast({
         title: "Access granted",
         description: "Welcome to the admin panel",
       });
       
-      // Navigate to admin page after a short delay to ensure the toast is visible
-      setTimeout(() => {
-        navigate('/admin');
-      }, 500);
+      // Navigate to admin page immediately
+      navigate('/admin');
     } else {
       toast({
         title: "Access denied",
