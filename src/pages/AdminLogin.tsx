@@ -27,18 +27,25 @@ const AdminLogin = () => {
   const location = useLocation();
   const { isConnected } = useWeb3();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
   
   // Check if admin access is already granted on component mount only once
   useEffect(() => {
-    // Check session storage only once when component mounts
+    // Prevent multiple checks
+    if (hasCheckedAuth) return;
+    
     const adminAccess = sessionStorage.getItem('adminAccess');
     
     if (adminAccess === 'true') {
-      console.log("Admin access found in session storage on login page, redirecting to /admin");
-      // Use replace to avoid adding to history stack, preventing back button issues
+      // Flag that we've checked auth status to prevent future checks
+      setHasCheckedAuth(true);
+      // Use replace to avoid adding to history stack
       navigate('/admin', { replace: true });
+    } else {
+      // Mark as checked even if not admin
+      setHasCheckedAuth(true);
     }
-  }, []); // Empty dependency array ensures this only runs once on mount
+  }, [navigate, hasCheckedAuth]);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -54,8 +61,6 @@ const AdminLogin = () => {
     if (data.code === ADMIN_CODE) {
       // Store admin access in session storage
       sessionStorage.setItem('adminAccess', 'true');
-      
-      console.log("Admin code verified, access granted, redirecting to /admin");
       
       toast({
         title: "Access granted",
@@ -88,6 +93,13 @@ const AdminLogin = () => {
         </div>
       </div>
     );
+  }
+
+  // Don't show the login form if we're still checking auth status or already navigating
+  if (!hasCheckedAuth) {
+    return <div className="container mx-auto px-4 py-16 flex justify-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>;
   }
 
   return (

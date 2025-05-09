@@ -17,17 +17,17 @@ import NotFound from "./pages/NotFound";
 // Create a client
 const queryClient = new QueryClient();
 
-// Admin route protector - fixed version with no redirect loops
+// Properly implemented admin route protection
 const ProtectedAdminRoute = ({ children }: { children: JSX.Element }) => {
   const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
   const location = useLocation();
   
   if (!isAdmin) {
-    console.log("Admin access denied, redirecting to login");
+    // If not admin, redirect to login with the current location saved
     return <Navigate to="/admin-login" replace state={{ from: location }} />;
   }
   
-  console.log("Admin access verified, rendering admin route");
+  // If admin, render the admin component
   return children;
 };
 
