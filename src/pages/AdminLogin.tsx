@@ -27,25 +27,27 @@ const AdminLogin = () => {
   const location = useLocation();
   const { isConnected } = useWeb3();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
+  const [loading, setLoading] = useState(true);
   
-  // Check if admin access is already granted on component mount only once
+  // Check once on initial render only
   useEffect(() => {
-    // Prevent multiple checks
-    if (hasCheckedAuth) return;
+    const checkAdminStatus = () => {
+      const adminAccess = sessionStorage.getItem('adminAccess');
+      
+      if (adminAccess === 'true') {
+        // Navigate to admin page and replace history entry
+        navigate('/admin', { replace: true });
+      } else {
+        // Done checking, not an admin
+        setLoading(false);
+      }
+    };
     
-    const adminAccess = sessionStorage.getItem('adminAccess');
+    // Only run once
+    checkAdminStatus();
     
-    if (adminAccess === 'true') {
-      // Flag that we've checked auth status to prevent future checks
-      setHasCheckedAuth(true);
-      // Use replace to avoid adding to history stack
-      navigate('/admin', { replace: true });
-    } else {
-      // Mark as checked even if not admin
-      setHasCheckedAuth(true);
-    }
-  }, [navigate, hasCheckedAuth]);
+    // No cleanup needed, and no dependencies to avoid re-running
+  }, []); // Empty dependency array ensures this only runs once
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -95,11 +97,13 @@ const AdminLogin = () => {
     );
   }
 
-  // Don't show the login form if we're still checking auth status or already navigating
-  if (!hasCheckedAuth) {
-    return <div className="container mx-auto px-4 py-16 flex justify-center">
-      <Loader2 className="h-8 w-8 animate-spin" />
-    </div>;
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-16 flex justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
   return (

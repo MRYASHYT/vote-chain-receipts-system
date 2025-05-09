@@ -17,18 +17,13 @@ import NotFound from "./pages/NotFound";
 // Create a client
 const queryClient = new QueryClient();
 
-// Properly implemented admin route protection
-const ProtectedAdminRoute = ({ children }: { children: JSX.Element }) => {
+// Simplified protected route - no state changes on render
+const ProtectedAdminRoute = () => {
   const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
   const location = useLocation();
   
-  if (!isAdmin) {
-    // If not admin, redirect to login with the current location saved
-    return <Navigate to="/admin-login" replace state={{ from: location }} />;
-  }
-  
-  // If admin, render the admin component
-  return children;
+  // Simple conditional rendering without state changes
+  return isAdmin ? <Admin /> : <Navigate to="/admin-login" replace state={{ from: location }} />;
 };
 
 const App: React.FC = () => {
@@ -44,11 +39,7 @@ const App: React.FC = () => {
               <Route path="/" element={<Home />} />
               <Route path="/votes" element={<VoteList />} />
               <Route path="/votes/:id" element={<VoteDetail />} />
-              <Route path="/admin" element={
-                <ProtectedAdminRoute>
-                  <Admin />
-                </ProtectedAdminRoute>
-              } />
+              <Route path="/admin" element={<ProtectedAdminRoute />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
