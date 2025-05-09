@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useWeb3 } from '@/context/Web3Context';
 import { Button } from '@/components/ui/button';
@@ -27,27 +27,18 @@ const AdminLogin = () => {
   const location = useLocation();
   const { isConnected } = useWeb3();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(true);
   
-  // Check once on initial render only
-  useEffect(() => {
-    const checkAdminStatus = () => {
-      const adminAccess = sessionStorage.getItem('adminAccess');
-      
-      if (adminAccess === 'true') {
-        // Navigate to admin page and replace history entry
-        navigate('/admin', { replace: true });
-      } else {
-        // Done checking, not an admin
-        setLoading(false);
-      }
-    };
-    
-    // Only run once
-    checkAdminStatus();
-    
-    // No cleanup needed, and no dependencies to avoid re-running
-  }, []); // Empty dependency array ensures this only runs once
+  // Check if user is already an admin
+  const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
+  
+  // If already admin, redirect directly to admin page without using useEffect
+  if (isAdmin) {
+    return (
+      <div className="container mx-auto px-4 py-16 flex justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -93,15 +84,6 @@ const AdminLogin = () => {
         <div className="mt-6 flex justify-center">
           <Button onClick={() => navigate('/')}>Return to Home</Button>
         </div>
-      </div>
-    );
-  }
-
-  // Show loading state while checking auth
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-16 flex justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }

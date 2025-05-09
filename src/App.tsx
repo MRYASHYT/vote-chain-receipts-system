@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Outlet } from "react-router-dom";
 import { Web3Provider } from "./context/Web3Context";
 import Navbar from "./components/layout/Navbar";
 import Home from "./pages/Home";
@@ -17,13 +17,18 @@ import NotFound from "./pages/NotFound";
 // Create a client
 const queryClient = new QueryClient();
 
-// Simplified protected route - no state changes on render
-const ProtectedAdminRoute = () => {
+// A stable implementation for protected routes
+const ProtectedRoute = () => {
   const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
   const location = useLocation();
   
-  // Simple conditional rendering without state changes
-  return isAdmin ? <Admin /> : <Navigate to="/admin-login" replace state={{ from: location }} />;
+  if (!isAdmin) {
+    // Only redirect if not admin
+    return <Navigate to="/admin-login" replace state={{ from: location }} />;
+  }
+  
+  // Admin is authenticated, show the admin component
+  return <Admin />;
 };
 
 const App: React.FC = () => {
@@ -39,7 +44,7 @@ const App: React.FC = () => {
               <Route path="/" element={<Home />} />
               <Route path="/votes" element={<VoteList />} />
               <Route path="/votes/:id" element={<VoteDetail />} />
-              <Route path="/admin" element={<ProtectedAdminRoute />} />
+              <Route path="/admin" element={<ProtectedRoute />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
