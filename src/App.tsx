@@ -17,7 +17,7 @@ import NotFound from "./pages/NotFound";
 // Create a client
 const queryClient = new QueryClient();
 
-// Admin route protector - fixed version
+// Admin route protector - fixed version with no redirect loops
 const ProtectedAdminRoute = ({ children }: { children: JSX.Element }) => {
   const isAdmin = sessionStorage.getItem('adminAccess') === 'true';
   const location = useLocation();

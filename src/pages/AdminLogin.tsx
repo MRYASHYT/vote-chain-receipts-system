@@ -27,21 +27,18 @@ const AdminLogin = () => {
   const location = useLocation();
   const { isConnected } = useWeb3();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [alreadyChecked, setAlreadyChecked] = useState(false);
   
-  // Check if admin access is already granted on mount
+  // Check if admin access is already granted on component mount only once
   useEffect(() => {
-    // Only check once and only if we're not already on the admin page
-    if (!alreadyChecked && location.pathname !== '/admin') {
-      setAlreadyChecked(true);
-      
-      const adminAccess = sessionStorage.getItem('adminAccess');
-      if (adminAccess === 'true') {
-        console.log("Admin access found in session storage, redirecting to /admin");
-        navigate('/admin', { replace: true });
-      }
+    // Check session storage only once when component mounts
+    const adminAccess = sessionStorage.getItem('adminAccess');
+    
+    if (adminAccess === 'true') {
+      console.log("Admin access found in session storage on login page, redirecting to /admin");
+      // Use replace to avoid adding to history stack, preventing back button issues
+      navigate('/admin', { replace: true });
     }
-  }, [navigate, location.pathname, alreadyChecked]);
+  }, []); // Empty dependency array ensures this only runs once on mount
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
