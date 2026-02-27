@@ -1,0 +1,16 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "vote-chain-receipts-system",
+    "compatibility_date": "2025-02-27",
+    "observability": {
+        "enabled": true
+    },
+    "assets": {
+        "directory": "dist",
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application"
+    },
+    "compatibility_flags": [
+        "nodejs_compat"
+    ]
+}
