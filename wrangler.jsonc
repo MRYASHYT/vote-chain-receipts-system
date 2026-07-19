@@ -1,6 +1,6 @@
 {
     "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "vote-chain-receipts-system",
+    "name": "blockchain-voting-system",
     "compatibility_date": "2025-02-27",
     "observability": {
         "enabled": true
